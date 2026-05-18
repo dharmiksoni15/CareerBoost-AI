@@ -1,9 +1,9 @@
 const JobDescription = require("../models/JobDescription");
 
-// Create and save job description
+// Create and save a new job description
 const createJobDescription = async (req, res) => {
   try {
-    // Get data from request body
+    // Get job title and description from request body
     const { jobTitle, description } = req.body || {};
 
     // Validate required fields
@@ -14,7 +14,7 @@ const createJobDescription = async (req, res) => {
       });
     }
 
-    // Save job description in MongoDB with logged-in user ID
+    // Save job description with logged-in user's ID
     const jobDescription = await JobDescription.create({
       userId: req.user._id,
       jobTitle,
@@ -28,7 +28,7 @@ const createJobDescription = async (req, res) => {
       jobDescription,
     });
   } catch (error) {
-    // Send server error response
+    // Handle server error
     return res.status(500).json({
       success: false,
       message: "Error saving job description",
@@ -37,6 +37,33 @@ const createJobDescription = async (req, res) => {
   }
 };
 
+// Get all job descriptions saved by logged-in user
+const getMyJobDescriptions = async (req, res) => {
+  try {
+    // Find job descriptions that belong to the logged-in user
+    const jobDescriptions = await JobDescription.find({
+      userId: req.user._id,
+    }).sort({ createdAt: -1 });
+
+    // Send success response with job descriptions list
+    return res.status(200).json({
+      success: true,
+      message: "Job descriptions fetched successfully",
+      count: jobDescriptions.length,
+      jobDescriptions,
+    });
+  } catch (error) {
+    // Handle server error
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching job descriptions",
+      error: error.message,
+    });
+  }
+};
+
+// Export controller functions
 module.exports = {
   createJobDescription,
+  getMyJobDescriptions,
 };
