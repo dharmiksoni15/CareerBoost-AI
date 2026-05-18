@@ -1,18 +1,17 @@
-const express=require("express");
+const express = require("express");
 
-// import controller functions
-const {createJobDescription,getMyJobDescriptions}=require("../controllers/jobDescriptionController");
+// Import controller function
+const {
+  createJobDescription,
+} = require("../controllers/jobDescriptionController");
 
-const authMiddleware=require("../middleware/authMiddleware");
+// Import authentication middleware
+const authMiddleware = require("../middleware/authMiddleware");
 
-const router=express.Router();
+const router = express.Router();
 
-// create job description route
-// user must be logged in to access this route
-router.post("/create",authMiddleware,createJobDescription);
+// Save job description route
+// Only logged-in users can access this route
+router.post("/create", authMiddleware, createJobDescription);
 
-// get logged user job description
-// user must logged in to access this route
-router.get("/my",authMiddleware,getMyJobDescriptions);
-
-module.exports=router;
+module.exports = router;
