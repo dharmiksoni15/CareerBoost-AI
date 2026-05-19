@@ -19,12 +19,14 @@ const resumeRoutes = require("./routes/resumeRoutes");
 // Import job description routes
 const jobDescriptionRoutes = require("./routes/jobDescriptionRoutes");
 
+// Import analysis routes
+const analysisRoutes = require("./routes/analysisRoutes");
+
 // Load environment variables from .env file
 dotenv.config();
 
 // Create Express application
 const app = express();
-
 
 // ==================== Middleware ====================
 
@@ -34,12 +36,17 @@ app.use(cors());
 // Parse incoming JSON request body
 app.use(express.json());
 
-
 // ==================== Database Connection ====================
 
 // Connect backend server to MongoDB database
 connectDB();
 
+// ==================== Test Route ====================
+
+// Test route to confirm correct server is running
+app.get("/test-server", (req, res) => {
+  res.send("Correct server is running");
+});
 
 // ==================== Routes ====================
 
@@ -55,6 +62,11 @@ app.use("/api/resume", resumeRoutes);
 // Base URL: /api/job-description
 app.use("/api/job-description", jobDescriptionRoutes);
 
+// Analysis routes
+// Base URL: /api/analysis
+app.use("/api/analysis", analysisRoutes);
+
+console.log("Analysis routes mounted at /api/analysis");
 
 // ==================== Start Server ====================
 
