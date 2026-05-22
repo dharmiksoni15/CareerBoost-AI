@@ -11,6 +11,7 @@ const resumeRoutes = require("./routes/resumeRoutes");
 const jobDescriptionRoutes = require("./routes/jobDescriptionRoutes");
 const analysisRoutes = require("./routes/analysisRoutes");
 const aiRoutes = require("./routes/aiRoutes");
+console.log("Ai Route Import",aiRoutes);
 
 const app = express();
 
@@ -18,6 +19,10 @@ app.use(cors());
 app.use(express.json());
 
 connectDB();
+
+app.get("/hello", (req, res) => {
+  res.send("Hello route working");
+});
 
 app.get("/test-server", (req, res) => {
   res.send("Correct server is running");

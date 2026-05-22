@@ -1,32 +1,54 @@
-// Import Gemini client
 const ai = require("../config/gemini");
 
-// Test Gemini API connection
+// ================= TEST GEMINI =================
 const testGemini = async (req, res) => {
   try {
-    // Send a simple prompt to Gemini
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: "Say: CareerBoost AI Gemini setup is working.",
+      contents: "Say: CareerBoost AI is working fine",
     });
 
-    // Send Gemini response back to client
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
-      message: "Gemini API connected successfully",
       result: response.text,
     });
   } catch (error) {
-    console.log("Gemini Test Error:", error);
-
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
-      message: "Gemini API test failed",
-      error: error.message,
+      message: error.message,
+    });
+  }
+};
+
+// ================= ANALYZE RESUME =================
+const analyzeResume = async (req, res) => {
+  try {
+    const { resumeId, jobDescriptionId } = req.body;
+
+    if (!resumeId || !jobDescriptionId) {
+      return res.status(400).json({
+        success: false,
+        message: "Resume ID and Job Description ID required",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Analyze route working (backend fixed)",
+      data: {
+        resumeId,
+        jobDescriptionId,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
     });
   }
 };
 
 module.exports = {
   testGemini,
+  analyzeResume,
 };
