@@ -1,50 +1,59 @@
 // Function to create AI analysis prompt
+
 const buildAnalysisPrompt = (resumeText, jobDescription) => {
-  // Create structured prompt for Gemini AI
+
   return `
-You are an expert AI career assistant.
 
-Analyze the following resume according to the given job description.
+You are an expert AI Resume Reviewer and Career Coach.
 
-Resume Content:
+Analyze the resume according to the job description.
+
+================ RESUME ================
 ${resumeText}
 
-Job Description:
+================ JOB DESCRIPTION ================
 ${jobDescription}
 
-Please provide:
+Your task:
 
-1. Matching skills
-2. Missing skills
-3. Resume improvement suggestions
-4. Give overall candidate score out of 100
-5. Mention whether candidate is a good fit or not
+1. Identify matching skills
+2. Identify missing skills
+3. Give resume improvement suggestions
+4. Suggest ATS optimization improvements
+5. Evaluate projects and technical skills
+6. Give overall candidate score out of 100
+7. Give final hiring verdict
 
-Give the response in a clear and professional format.
+Return response ONLY in this format:
 
-Return response Only in this format:
-
-Matching skills:
+Matching Skills:
 - Skill 1
 - Skill 2
 - Skill 3
 
-Missing skills:
-- Skill A
-- Skill B
+Missing Skills:
+- Skill 1
+- Skill 2
+- Skill 3
 
-resume improvement suggestions:
+Resume Improvement Suggestions:
+1. Suggestion 1
+2. Suggestion 2
+3. Suggestion 3
+
+ATS Optimization Suggestions:
 1. Suggestion 1
 2. Suggestion 2
 
-overall score out of 100:
-- Score
+Overall Candidate Score:
+- Score/100
 
 Final Verdict:
-- Candidate is a good fit / not a good fit
+- Good Fit / Average Fit / Not a Good Fit
 
 `;
+
 };
 
-// Export prompt builder function
+// Export function
 module.exports = buildAnalysisPrompt;
