@@ -5,6 +5,7 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import PrivateRoute from './routes/PrivateRoute'
 import UploadResume from './pages/UploadResume'
+import JobDescription from "./pages/JobDescription";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         />
 
         <Route path="/upload-resume" element={<UploadResume />} />
+        <Route path="/job-description"element={<JobDescription />}/>
 
       </Routes>
     </BrowserRouter>
