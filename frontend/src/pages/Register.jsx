@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import api from '../services/api'
 
 function Register() {
   const navigate = useNavigate()
@@ -17,15 +18,26 @@ function Register() {
     })
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = async (e) => {
+  e.preventDefault()
 
-    console.log("REGISTER DATA:", form)
+  try {
+    const payload = {
+      name: form.name,
+      email: form.email,
+      password: form.password
+    }
 
-    // ✅ IMPORTANT FIX:
-    // register complete thay pachi login par redirect
+    const response = await api.post('/auth/register', payload)
+
+    console.log("REGISTER SUCCESS:", response.data)
+
     navigate('/login')
+
+  } catch (error) {
+    console.log("REGISTER ERROR:", error.response?.data || error.message)
   }
+}
 
   return (
     <div style={{ maxWidth: "300px", margin: "auto" }}>
@@ -60,4 +72,4 @@ function Register() {
   )
 }
 
-export default Register
+export default Register 

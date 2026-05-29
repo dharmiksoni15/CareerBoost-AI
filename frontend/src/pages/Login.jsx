@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import api from '../services/api'
 
 function Login() {
   const navigate = useNavigate()
@@ -16,13 +17,28 @@ function Login() {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
-    console.log("LOGIN DATA:", form)
+    try {
+      const payload = {
+        email: form.email,
+        password: form.password
+      }
 
-   
-    navigate('/dashboard')
+      const response = await api.post('/auth/login', payload)
+
+      console.log("LOGIN SUCCESS:", response.data)
+
+      // 🔥 TOKEN SAVE
+      localStorage.setItem("token", response.data.token)
+
+      // redirect to dashboard
+      navigate('/dashboard')
+
+    } catch (error) {
+      console.log("LOGIN ERROR:", error.response?.data || error.message)
+    }
   }
 
   return (
