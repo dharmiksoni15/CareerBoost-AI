@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard'
 import PrivateRoute from './routes/PrivateRoute'
 import UploadResume from './pages/UploadResume'
 import JobDescription from "./pages/JobDescription";
+import AIAnalysis from "./pages/AIAnalysis";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
 
         <Route path="/upload-resume" element={<UploadResume />} />
         <Route path="/job-description"element={<JobDescription />}/>
+        <Route path="/ai-analysis" element={<AIAnalysis />} />
 
       </Routes>
     </BrowserRouter>
