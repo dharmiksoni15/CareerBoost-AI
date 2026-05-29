@@ -1,11 +1,10 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
-
 import PrivateRoute from './routes/PrivateRoute'
+import UploadResume from './pages/UploadResume'
 
 function App() {
   return (
@@ -16,7 +15,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* 🔒 PROTECTED ROUTE */}
+        {/*  PROTECTED ROUTE */}
         <Route
           path="/dashboard"
           element={
@@ -25,6 +24,8 @@ function App() {
             </PrivateRoute>
           }
         />
+
+        <Route path="/upload-resume" element={<UploadResume />} />
 
       </Routes>
     </BrowserRouter>
