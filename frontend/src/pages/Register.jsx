@@ -22,37 +22,39 @@ function Register() {
 
     console.log("REGISTER DATA:", form)
 
-    // later API call
+    // ✅ IMPORTANT FIX:
+    // register complete thay pachi login par redirect
     navigate('/login')
   }
 
   return (
-    <div>
-      <h1>Register Page</h1>
+    <div style={{ maxWidth: "300px", margin: "auto" }}>
+      <h2>Register Page</h2>
 
       <form onSubmit={handleSubmit}>
         <input
-          type="text"
           name="name"
           placeholder="Name"
           onChange={handleChange}
         />
+        <br /><br />
 
         <input
-          type="email"
           name="email"
           placeholder="Email"
           onChange={handleChange}
         />
+        <br /><br />
 
         <input
-          type="password"
           name="password"
           placeholder="Password"
+          type="password"
           onChange={handleChange}
         />
+        <br /><br />
 
-        <button type="submit">Register</button>
+        <button>Register</button>
       </form>
     </div>
   )

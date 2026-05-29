@@ -21,31 +21,31 @@ function Login() {
 
     console.log("LOGIN DATA:", form)
 
-    // later: API call here
-    // success hoy to dashboard
+   
     navigate('/dashboard')
   }
 
   return (
-    <div>
-      <h1>Login Page</h1>
+    <div style={{ maxWidth: "300px", margin: "auto" }}>
+      <h2>Login Page</h2>
 
       <form onSubmit={handleSubmit}>
         <input
-          type="email"
           name="email"
           placeholder="Email"
           onChange={handleChange}
         />
+        <br /><br />
 
         <input
-          type="password"
           name="password"
           placeholder="Password"
+          type="password"
           onChange={handleChange}
         />
+        <br /><br />
 
-        <button type="submit">Login</button>
+        <button>Login</button>
       </form>
     </div>
   )
