@@ -1,15 +1,18 @@
 import React, { useRef, useState } from "react";
+import api from "../services/api";
 
-const ResumeUploadCard = () => {
+const ResumeUploadCard = ({ onUpload }) => {
   const [fileName, setFileName] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const inputRef = useRef(null);
 
-  const handleDrop = (e) => {
+  const handleDrop = async (e) => {
     e.preventDefault();
     e.stopPropagation();
     const file = e.dataTransfer.files[0];
     if (file) {
-      setFileName(file.name);
+      await uploadFile(file);
     }
   };
 
@@ -18,15 +21,36 @@ const ResumeUploadCard = () => {
     e.stopPropagation();
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFileName(file.name);
+      await uploadFile(file);
     }
   };
 
   const handleClick = () => {
     inputRef.current.click();
+  };
+
+  const uploadFile = async (file) => {
+    setUploading(true);
+    setFileName(file.name);
+    setSuccess(false);
+    try {
+      const formData = new FormData();
+      formData.append("resume", file);
+      const res = await api.post("/resume/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      if (res.data && res.data.resume && onUpload) {
+        onUpload(res.data.resume._id);
+        setSuccess(true);
+      }
+    } catch (err) {
+      alert("Resume upload failed");
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -62,7 +86,11 @@ const ResumeUploadCard = () => {
         />
       </svg>
       <p className="text-lg text-white font-semibold mb-2">
-        Drop or Upload Your Resume
+        {uploading
+          ? "Uploading..."
+          : success
+          ? "Resume uploaded!"
+          : "Drop or Upload Your Resume"}
       </p>
       <input
         type="file"
@@ -71,9 +99,13 @@ const ResumeUploadCard = () => {
         ref={inputRef}
         onChange={handleFileChange}
       />
-      {fileName && (
-        <div className="mt-4 px-4 py-2 rounded-lg bg-white/20 text-white text-sm font-medium shadow-inner">
-          {fileName}
+      {fileName && !uploading && (
+        <div
+          className={`mt-4 px-4 py-2 rounded-lg text-white text-sm font-medium shadow-inner ${
+            success ? "bg-green-500/60" : "bg-white/20"
+          }`}
+        >
+          {fileName} {success && <span className="ml-2">✔️</span>}
         </div>
       )}
     </div>

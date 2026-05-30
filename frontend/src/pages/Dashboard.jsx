@@ -1,17 +1,37 @@
 import React, { useState } from "react";
-
-// Placeholder imports (do not create these components yet)
 import ResumeUploadCard from "../components/ResumeUploadCard";
 import JobDescriptionCard from "../components/JobDescriptionCard";
 import AnalysisResult from "../components/AnalysisResult";
+import api from "../services/api";
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(false);
+  const [resumeId, setResumeId] = useState(null);
+  const [jobDescriptionId, setJobDescriptionId] = useState(null);
+  const [analysis, setAnalysis] = useState(null);
+  const [ready, setReady] = useState(false);
 
-  const handleAnalyze = () => {
+  // Listen for both resume and job description to be ready
+  React.useEffect(() => {
+    setReady(!!resumeId && !!jobDescriptionId);
+  }, [resumeId, jobDescriptionId]);
+
+  const handleAnalyze = async () => {
+    if (!ready) {
+      alert("Please upload resume and save job description first.");
+      return;
+    }
     setLoading(true);
-    // Simulate analysis delay
-    setTimeout(() => setLoading(false), 2000);
+    setAnalysis(null);
+    try {
+      const res = await api.post("/ai/analyze", { resumeId, jobDescriptionId });
+      console.log("AI RESPONSE:", res.data);
+      setAnalysis(res.data.analysis);
+    } catch (err) {
+      alert("Analysis failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -22,13 +42,13 @@ const Dashboard = () => {
           {/* Left: Resume Upload Card */}
           <div className="flex-1">
             <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-lg p-6 md:p-8 border border-white/20">
-              <ResumeUploadCard />
+              <ResumeUploadCard onUpload={setResumeId} />
             </div>
           </div>
           {/* Right: Job Description Card */}
           <div className="flex-1">
             <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-lg p-6 md:p-8 border border-white/20">
-              <JobDescriptionCard />
+              <JobDescriptionCard onSave={setJobDescriptionId} />
             </div>
           </div>
         </div>
@@ -36,9 +56,9 @@ const Dashboard = () => {
         <div className="flex flex-col items-center gap-6">
           <button
             className={`px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-semibold shadow-lg transition-all duration-200 backdrop-blur-md border border-white/20 flex items-center justify-center ${
-              loading ? "opacity-60 cursor-not-allowed" : "hover:from-blue-700 hover:to-indigo-800"
+              loading || !ready ? "opacity-60 cursor-not-allowed" : "hover:from-blue-700 hover:to-indigo-800"
             }`}
-            disabled={loading}
+            disabled={loading || !ready}
             onClick={handleAnalyze}
           >
             {loading && (
@@ -63,11 +83,11 @@ const Dashboard = () => {
                 />
               </svg>
             )}
-            {loading ? "Analyzing..." : "Analyze Resume"}
+            {loading ? "Analyzing..." : ready ? "Analyze Resume" : "Upload Resume & Save Job Description"}
           </button>
-          {/* Placeholder for analysis result */}
+          {/* Analysis Result */}
           <div className="w-full">
-            <AnalysisResult />
+            <AnalysisResult data={analysis} />
           </div>
         </div>
       </div>

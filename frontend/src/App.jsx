@@ -27,9 +27,32 @@ function App() {
           }
         />
 
-        <Route path="/upload-resume" element={<UploadResume />} />
-        <Route path="/job-description"element={<JobDescription />}/>
-        <Route path="/ai-analysis" element={<AIAnalysis />} />
+       <Route
+  path="/upload-resume"
+  element={
+    <PrivateRoute>
+      <UploadResume />
+    </PrivateRoute>
+  }
+/>
+
+<Route
+  path="/job-description"
+  element={
+    <PrivateRoute>
+      <JobDescription />
+    </PrivateRoute>
+  }
+/>
+
+<Route
+  path="/ai-analysis"
+  element={
+    <PrivateRoute>
+      <AIAnalysis />
+    </PrivateRoute>
+  }
+/>
 
       </Routes>
     </BrowserRouter>
