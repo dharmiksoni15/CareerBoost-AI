@@ -3,6 +3,7 @@ import ResumeUploadCard from "../components/ResumeUploadCard";
 import JobDescriptionCard from "../components/JobDescriptionCard";
 import AnalysisResult from "../components/AnalysisResult";
 import api from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(false);
@@ -15,6 +16,8 @@ const Dashboard = () => {
   React.useEffect(() => {
     setReady(!!resumeId && !!jobDescriptionId);
   }, [resumeId, jobDescriptionId]);
+
+  const navigate = useNavigate();
 
   const handleAnalyze = async () => {
     if (!ready) {
@@ -34,9 +37,25 @@ const Dashboard = () => {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#0f172a] px-4 py-8">
       <div className="w-full max-w-5xl flex flex-col gap-8">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-white">CareerBoost AI</h1>
+
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-200 shadow-lg"
+          >
+            Logout
+          </button>
+        </div>
         {/* Main Dashboard Cards */}
         <div className="flex flex-col md:flex-row gap-8">
           {/* Left: Resume Upload Card */}
@@ -56,7 +75,9 @@ const Dashboard = () => {
         <div className="flex flex-col items-center gap-6">
           <button
             className={`px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-semibold shadow-lg transition-all duration-200 backdrop-blur-md border border-white/20 flex items-center justify-center ${
-              loading || !ready ? "opacity-60 cursor-not-allowed" : "hover:from-blue-700 hover:to-indigo-800"
+              loading || !ready
+                ? "opacity-60 cursor-not-allowed"
+                : "hover:from-blue-700 hover:to-indigo-800"
             }`}
             disabled={loading || !ready}
             onClick={handleAnalyze}
@@ -83,7 +104,11 @@ const Dashboard = () => {
                 />
               </svg>
             )}
-            {loading ? "Analyzing..." : ready ? "Analyze Resume" : "Upload Resume & Save Job Description"}
+            {loading
+              ? "Analyzing..."
+              : ready
+                ? "Analyze Resume"
+                : "Upload Resume & Save Job Description"}
           </button>
           {/* Analysis Result */}
           <div className="w-full">
