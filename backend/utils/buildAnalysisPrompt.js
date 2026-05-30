@@ -1,59 +1,60 @@
 // Function to create AI analysis prompt
 
-const buildAnalysisPrompt = (resumeText, jobDescription) => {
+const buildAnalysisPrompt = (
+  resumeText,
+  jobDescription
+) => {
 
   return `
 
-You are an expert AI Resume Reviewer and Career Coach.
+You are an expert AI Resume Reviewer and Interview Coach.
 
 Analyze the resume according to the job description.
 
 ================ RESUME ================
+
 ${resumeText}
 
 ================ JOB DESCRIPTION ================
+
 ${jobDescription}
 
-Your task:
+================ TASKS ================
 
 1. Identify matching skills
+
 2. Identify missing skills
+
 3. Give resume improvement suggestions
+
 4. Suggest ATS optimization improvements
-5. Evaluate projects and technical skills
-6. Give overall candidate score out of 100
-7. Give final hiring verdict
 
-Return response ONLY in this format:
+5. Give overall candidate score out of 100
 
-Matching Skills:
-- Skill 1
-- Skill 2
-- Skill 3
+6. Mention whether candidate is a good fit or not
 
-Missing Skills:
-- Skill 1
-- Skill 2
-- Skill 3
+7. Generate 5 technical interview questions based on:
+   - Resume skills
+   - Projects
+   - Missing skills
+   - Job description
 
-Resume Improvement Suggestions:
-1. Suggestion 1
-2. Suggestion 2
-3. Suggestion 3
+================ RESPONSE FORMAT ================
 
-ATS Optimization Suggestions:
-1. Suggestion 1
-2. Suggestion 2
+================ RESPONSE FORMAT ================
 
-Overall Candidate Score:
-- Score/100
+Return ONLY valid JSON.
 
-Final Verdict:
-- Good Fit / Average Fit / Not a Good Fit
+{
+  "score": 0,
+  "summary": "",
+  "strengths": [],
+  "weaknesses": [],
+  "suggestion": ""
+}
 
 `;
 
 };
 
-// Export function
 module.exports = buildAnalysisPrompt;

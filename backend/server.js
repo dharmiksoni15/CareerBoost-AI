@@ -2,43 +2,54 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 
-// Load environment variables FIRST
+// Load env FIRST
 dotenv.config();
 
+// DB connection
 const connectDB = require("./config/db");
+
+// Routes
 const authRoutes = require("./routes/authRoutes");
 const resumeRoutes = require("./routes/resumeRoutes");
 const jobDescriptionRoutes = require("./routes/jobDescriptionRoutes");
 const analysisRoutes = require("./routes/analysisRoutes");
 const aiRoutes = require("./routes/aiRoutes");
-console.log("Ai Route Import",aiRoutes);
 
 const app = express();
 
+// ================= MIDDLEWARE =================
 app.use(cors());
 app.use(express.json());
 
+// ================= DB CONNECT =================
 connectDB();
 
-app.get("/hello", (req, res) => {
-  res.send("Hello route working");
-});
-
+// ================= TEST ROUTE =================
 app.get("/test-server", (req, res) => {
-  res.send("Correct server is running");
+  res.json({
+    success: true,
+    message: "Server is running correctly 🚀",
+  });
 });
 
+// ================= ROUTES =================
 app.use("/api/auth", authRoutes);
 app.use("/api/resume", resumeRoutes);
 app.use("/api/job-description", jobDescriptionRoutes);
 app.use("/api/analysis", analysisRoutes);
 app.use("/api/ai", aiRoutes);
 
-console.log("Analysis routes mounted at /api/analysis");
-console.log("AI routes mounted at /api/ai");
+// ================= DEBUG LOGS =================
+console.log("✅ Routes loaded:");
+console.log("- /api/auth");
+console.log("- /api/resume");
+console.log("- /api/job-description");
+console.log("- /api/analysis");
+console.log("- /api/ai");
 
+// ================= START SERVER =================
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });

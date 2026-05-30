@@ -13,15 +13,14 @@ const buildAnalysisPrompt = require("../utils/buildAnalysisPrompt");
 
 console.log("Extract Function:", extractResumeText);
 
-
 // ==================== TEST GEMINI ====================
 
 const testGemini = async (req, res) => {
   try {
-    console.log("TEST GEMINI ROUTE HIT");
+    console.log("TEST GEMINI ROUTE HIT"); 
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-3.5-flash",
       contents: "Say: Gemini API is working",
     });
 
@@ -40,7 +39,6 @@ const testGemini = async (req, res) => {
     });
   }
 };
-
 
 // ==================== ANALYZE RESUME ====================
 
@@ -95,44 +93,44 @@ const analyzeResume = async (req, res) => {
     const resumeText = await extractResumeText(resume.filePath);
 
     console.log("Extracted Resume Text Success");
+    console.log(resumeText);
+    
 
     // ==================== BUILD PROMPT ====================
-    const prompt = buildAnalysisPrompt(
-      resumeText,
-      jobDescription.description
-    );
+    const prompt = buildAnalysisPrompt(resumeText, jobDescription.description);
 
     console.log("Prompt Generated");
+    console.log("Prompt:", prompt);
 
     // ==================== 🔥 MOCK MODE (DEV ONLY) ====================
-    if (process.env.NODE_ENV === "development") {
-      console.log("MOCK MODE ACTIVE - skipping Gemini API");
+    // if (process.env.NODE_ENV === "development") {
+    //   console.log("MOCK MODE ACTIVE - skipping Gemini API");
 
-      return res.status(200).json({
-        success: true,
-        message: "Mock AI response (development mode)",
-        analysis: {
-          score: 72,
-          summary:
-            "Good resume overall but needs improvement in backend and system design.",
-          strengths: ["React", "Node.js", "MongoDB basics"],
-          weaknesses: [
-            "System design",
-            "Scalability",
-            "Advanced backend architecture",
-          ],
-          suggestion:
-            "Add more real-world projects, deployment experience, and system design knowledge.",
-        },
-      });
-    }
+    //   return res.status(200).json({
+    //     success: true,
+    //     message: "Mock AI response (development mode)",
+    //     analysis: {
+    //       score: 72,
+    //       summary:
+    //         "Good resume overall but needs improvement in backend and system design.",
+    //       strengths: ["React", "Node.js", "MongoDB basics"],
+    //       weaknesses: [
+    //         "System design",
+    //         "Scalability",
+    //         "Advanced backend architecture",
+    //       ],
+    //       suggestion:
+    //         "Add more real-world projects, deployment experience, and system design knowledge.",
+    //     },
+    //   });
+    // }
 
     // ==================== GEMINI REQUEST ====================
     let response;
 
     try {
       response = await ai.models.generateContent({
-        model: "gemini-2.0-flash",
+        model: "gemini-3.5-flash",
         contents: prompt,
       });
     } catch (geminiError) {
@@ -164,18 +162,26 @@ const analyzeResume = async (req, res) => {
     }
 
     // ==================== RESPONSE HANDLING ====================
-    let analysisText = "No analysis generated";
+    let analysisData = {
+      score: 0,
+      summary: "",
+      strengths: [],
+      weaknesses: [],
+      suggestion: "",
+    };
 
     if (response && response.text) {
-      analysisText = response.text;
+      try {
+        analysisData = JSON.parse(response.text);
+      } catch (e) {
+        analysisData.summary = response.text;
+      }
     }
-
-    console.log("AI Analysis Generated");
 
     return res.status(200).json({
       success: true,
       message: "Resume analyzed successfully",
-      analysis: analysisText,
+      analysis: analysisData,
     });
   } catch (error) {
     console.log("Resume Analysis Error:", error);
@@ -187,7 +193,6 @@ const analyzeResume = async (req, res) => {
     });
   }
 };
-
 
 // ==================== EXPORTS ====================
 
