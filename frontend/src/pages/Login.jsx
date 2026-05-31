@@ -21,53 +21,34 @@ function Login() {
     e.preventDefault();
 
     try {
-      const payload = {
-        email: form.email,
-        password: form.password,
-      };
+      const res = await api.post("/auth/login", form);
 
-      const response = await api.post(
-        "/auth/login",
-        payload
-      );
-
-      localStorage.setItem(
-        "token",
-        response.data.token
-      );
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
 
       navigate("/dashboard");
     } catch (error) {
-      console.log(
-        "LOGIN ERROR:",
-        error.response?.data || error.message
-      );
+      console.log("LOGIN ERROR:", error.response?.data || error.message);
     }
   };
 
   return (
     <div className="min-h-screen bg-[#020f2d] flex items-center justify-center px-4">
-
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-2xl"
       >
-
-        <h1 className="text-4xl font-bold text-center text-white mb-2">
-          Welcome Back
+        <h1 className="text-4xl text-white text-center mb-4">
+          Login
         </h1>
-
-        <p className="text-center text-gray-300 mb-8">
-          Login to CareerBoost AI
-        </p>
 
         <input
           type="email"
           name="email"
-          placeholder="Email Address"
+          placeholder="Email"
           value={form.email}
           onChange={handleChange}
-          className="w-full p-3 mb-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 outline-none"
+          className="w-full p-3 mb-4 rounded-xl bg-white/10 text-white"
         />
 
         <input
@@ -76,28 +57,17 @@ function Login() {
           placeholder="Password"
           value={form.password}
           onChange={handleChange}
-          className="w-full p-3 mb-6 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 outline-none"
+          className="w-full p-3 mb-6 rounded-xl bg-white/10 text-white"
         />
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 transition-all text-white py-3 rounded-xl font-semibold"
-        >
+        <button className="w-full bg-blue-600 text-white py-3 rounded-xl">
           Login
         </button>
 
-        <p className="text-center text-gray-300 mt-6">
-          Don't have an account?{" "}
-          <Link
-            to="/register"
-            className="text-blue-400 hover:text-blue-300"
-          >
-            Register
-          </Link>
+        <p className="text-center text-gray-300 mt-4">
+          No account? <Link to="/register">Register</Link>
         </p>
-
       </form>
-
     </div>
   );
 }
