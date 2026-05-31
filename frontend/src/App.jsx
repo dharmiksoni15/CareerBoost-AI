@@ -5,7 +5,7 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import PrivateRoute from './routes/PrivateRoute'
 import UploadResume from './pages/UploadResume'
-import JobDescription from "./pages/JobDescription";
+
 import AIAnalysis from "./pages/AIAnalysis";
 
 function App() {
@@ -36,14 +36,7 @@ function App() {
   }
 />
 
-<Route
-  path="/job-description"
-  element={
-    <PrivateRoute>
-      <JobDescription />
-    </PrivateRoute>
-  }
-/>
+
 
 <Route
   path="/ai-analysis"

@@ -47,7 +47,7 @@ const Dashboard = () => {
       <div className="w-full max-w-5xl flex flex-col gap-8">
         {/* Header */}
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-white">CareerBoost AI</h1>
+          <h1 className="text-3xl font-bold text-white">AI-Powered Resume Analyzer</h1>
 
           <button
             onClick={handleLogout}
