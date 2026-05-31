@@ -165,56 +165,76 @@ Job seekers spend hours tailoring resumes without knowing whether their resume a
 
 ## 📁 Folder Structure
 
-```
+```text
 CareerBoost-AI/
 │
 ├── 📂 frontend/
+│   │
 │   ├── 📂 src/
-│   │   ├── 📂 components/          # Reusable UI components
-│   │   │   ├── Navbar.jsx
-│   │   │   ├── ResumeCard.jsx
+│   │   │
+│   │   ├── 📂 components/
 │   │   │   ├── AnalysisResult.jsx
-│   │   │   └── PrivateRoute.jsx
-│   │   ├── 📂 pages/               # Page-level components
+│   │   │   ├── JobDescriptionCard.jsx
+│   │   │   └── ResumeUploadCard.jsx
+│   │   │
+│   │   ├── 📂 pages/
+│   │   │   ├── AIAnalysis.jsx
+│   │   │   ├── Dashboard.jsx
 │   │   │   ├── Login.jsx
 │   │   │   ├── Register.jsx
-│   │   │   ├── Dashboard.jsx
-│   │   │   ├── UploadResume.jsx
-│   │   │   └── AnalysisPage.jsx
-│   │   ├── 📂 routes/              # React Router config
-│   │   │   └── AppRouter.jsx
-│   │   ├── 📂 services/            # Axios API calls
-│   │   │   ├── authService.js
-│   │   │   ├── resumeService.js
-│   │   │   └── analysisService.js
-│   │   ├── 📂 assets/              # Images, icons, static files
+│   │   │   └── UploadResume.jsx
+│   │   │
+│   │   ├── 📂 routes/
+│   │   │   └── PrivateRoute.jsx
+│   │   │
+│   │   ├── 📂 services/
+│   │   │   └── api.js
+│   │   │
+│   │   ├── 📂 utils/
+│   │   │   └── (currently empty)
+│   │   │
 │   │   ├── App.jsx
 │   │   └── main.jsx
-│   ├── index.html
+│   │
+│   ├── package.json
 │   ├── vite.config.js
-│   └── tailwind.config.js
+│   └── index.html
 │
 ├── 📂 backend/
-│   ├── 📂 controllers/             # Request handlers
+│   │
+│   ├── 📂 config/
+│   │   ├── db.js
+│   │   └── gemini.js
+│   │
+│   ├── 📂 controllers/
+│   │   ├── aiController.js
+│   │   ├── analysisController.js
 │   │   ├── authController.js
-│   │   ├── resumeController.js
-│   │   └── analysisController.js
-│   ├── 📂 models/                  # Mongoose schemas
-│   │   ├── User.js
-│   │   └── Resume.js
-│   ├── 📂 routes/                  # Express route definitions
-│   │   ├── authRoutes.js
-│   │   ├── resumeRoutes.js
-│   │   └── analysisRoutes.js
-│   ├── 📂 middleware/              # Auth & error middleware
+│   │   └── jobDescriptionController.js
+│   │
+│   ├── 📂 middleware/
 │   │   ├── authMiddleware.js
-│   │   └── errorMiddleware.js
-│   ├── 📂 config/                  # DB and env config
-│   │   └── db.js
-│   ├── 📂 utils/                   # Helper utilities
-│   │   ├── pdfParser.js
-│   │   └── geminiHelper.js
-│   ├── 📂 uploads/                 # Temporary file storage
+│   │   └── uploadMiddleware.js
+│   │
+│   ├── 📂 models/
+│   │   ├── JobDescription.js
+│   │   ├── Resume.js
+│   │   └── User.js
+│   │
+│   ├── 📂 routes/
+│   │   ├── aiRoutes.js
+│   │   ├── analysisRoutes.js
+│   │   ├── authRoutes.js
+│   │   ├── jobDescriptionRoutes.js
+│   │   └── resumeRoutes.js
+│   │
+│   ├── 📂 utils/
+│   │   ├── buildAnalysisPrompt.js
+│   │   └── extractResumeText.js
+│   │
+│   ├── 📂 uploads/
+│   │   └── uploaded PDF files
+│   │
 │   ├── server.js
 │   └── package.json
 │
@@ -351,17 +371,10 @@ cd careerboost-ai
 ### 2️⃣ Backend Setup
 
 ```bash
-# Navigate to backend directory
 cd backend
-
-# Install dependencies
 npm install
-
-# Create environment file
 cp .env.example .env
-# Fill in your environment variables (see Environment Variables section)
-
-# Start the backend server
+# Fill in your environment variables
 npm run dev
 ```
 
@@ -372,17 +385,10 @@ The backend server will start at: `http://localhost:5000`
 ### 3️⃣ Frontend Setup
 
 ```bash
-# Navigate to frontend directory
 cd ../frontend
-
-# Install dependencies
 npm install
-
-# Create environment file
 cp .env.example .env
 # Add your VITE_API_URL
-
-# Start the frontend development server
 npm run dev
 ```
 
@@ -392,10 +398,7 @@ The frontend will be available at: `http://localhost:5173`
 
 ### 4️⃣ Run Full Project (Both Servers)
 
-You can run both frontend and backend simultaneously using:
-
 ```bash
-# From the root directory
 # Terminal 1 — Backend
 cd backend && npm run dev
 
@@ -423,13 +426,11 @@ JWT_SECRET=your_super_secret_jwt_key_here
 GEMINI_API_KEY=your_google_gemini_api_key_here
 ```
 
----
-
 ### 🌐 Frontend — `/frontend/.env`
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `VITE_API_URL` | Base URL of the deployed or local backend API | `http://localhost:5000/api` |
+| `VITE_API_URL` | Base URL of the backend API | `http://localhost:5000/api` |
 
 ```env
 VITE_API_URL=https://careerboost-ai-g7vs.onrender.com/api
@@ -441,7 +442,7 @@ VITE_API_URL=https://careerboost-ai-g7vs.onrender.com/api
 
 ## 📚 API Documentation
 
-### 🔐 Authentication APIs
+### 🔐 Auth APIs — `/api/auth`
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|:-------------:|
@@ -449,7 +450,7 @@ VITE_API_URL=https://careerboost-ai-g7vs.onrender.com/api
 | `POST` | `/api/auth/login` | Login and receive JWT token | ❌ |
 | `GET` | `/api/auth/profile` | Get authenticated user profile | ✅ |
 
-#### Example Request — Register
+#### Example — Register
 
 ```json
 POST /api/auth/register
@@ -462,8 +463,6 @@ Content-Type: application/json
 }
 ```
 
-#### Example Response
-
 ```json
 {
   "success": true,
@@ -474,49 +473,104 @@ Content-Type: application/json
 
 ---
 
-### 📄 Resume APIs
+### 📄 Resume APIs — `/api/resume`
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|:-------------:|
-| `POST` | `/api/resume/upload` | Upload a PDF resume | ✅ |
-| `GET` | `/api/resume/all` | Get all resumes for the user | ✅ |
-| `GET` | `/api/resume/:id` | Get a specific resume by ID | ✅ |
-| `DELETE` | `/api/resume/:id` | Delete a resume | ✅ |
+| `POST` | `/api/resume/upload` | Upload a PDF resume (multipart/form-data, field: `resume`) | ✅ |
+| `GET` | `/api/resume/my` | Get all resumes uploaded by logged-in user | ✅ |
 
----
+#### Example — Upload Resume
 
-### 📋 Job Description APIs
+```
+POST /api/resume/upload
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: multipart/form-data
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|:-------------:|
-| `POST` | `/api/job/add` | Add a new job description | ✅ |
-| `GET` | `/api/job/all` | Get all saved job descriptions | ✅ |
-| `DELETE` | `/api/job/:id` | Delete a job description | ✅ |
-
----
-
-### 🤖 AI Analysis APIs
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|:-------------:|
-| `POST` | `/api/analysis/analyze` | Analyze resume against job description | ✅ |
-| `GET` | `/api/analysis/results/:id` | Get stored analysis results | ✅ |
-| `GET` | `/api/analysis/history` | Get full analysis history for user | ✅ |
-
-#### Example Analysis Request
+Body: resume = <pdf file>
+```
 
 ```json
-POST /api/analysis/analyze
+{
+  "success": true,
+  "message": "Resume uploaded and saved successfully",
+  "resume": {
+    "_id": "64abc123...",
+    "user": "64xyz789...",
+    "fileName": "resume-1234567890.pdf",
+    "filePath": "uploads/resume-1234567890.pdf",
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  }
+}
+```
+
+---
+
+### 📋 Job Description APIs — `/api/job-description`
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|:-------------:|
+| `POST` | `/api/job-description/create` | Create a new job description | ✅ |
+| `GET` | `/api/job-description/my` | Get all job descriptions of logged-in user | ✅ |
+
+#### Example — Create Job Description
+
+```json
+POST /api/job-description/create
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: application/json
+
+{
+  "title": "Full Stack Developer",
+  "description": "We are looking for a Full Stack Developer with experience in React, Node.js..."
+}
+```
+
+---
+
+### 🧩 Analysis APIs — `/api/analysis`
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|:-------------:|
+| `GET` | `/api/analysis/test` | Test if analysis route is working | ❌ |
+| `POST` | `/api/analysis/prepare` | Prepare resume + job description data for AI analysis | ✅ |
+
+#### Example — Prepare Analysis
+
+```json
+POST /api/analysis/prepare
 Authorization: Bearer <JWT_TOKEN>
 Content-Type: application/json
 
 {
   "resumeId": "64abc123...",
-  "jobDescription": "We are looking for a Full Stack Developer with experience in React, Node.js..."
+  "jobDescriptionId": "64def456..."
 }
 ```
 
-#### Example Analysis Response
+---
+
+### 🤖 AI APIs — `/api/ai`
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|:-------------:|
+| `GET` | `/api/ai/test` | Test Gemini API connection | ✅ |
+| `POST` | `/api/ai/analyze` | Run AI analysis on resume vs job description | ✅ |
+
+#### Example — AI Analysis Request
+
+```json
+POST /api/ai/analyze
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: application/json
+
+{
+  "resumeId": "64abc123...",
+  "jobDescriptionId": "64def456..."
+}
+```
+
+#### Example — AI Analysis Response
 
 ```json
 {
@@ -537,6 +591,21 @@ Content-Type: application/json
     "matchScore": "78%",
     "overallFeedback": "Your resume is a strong match for this role with a few targeted improvements."
   }
+}
+```
+
+---
+
+### 🛠️ Server Health
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|:-------------:|
+| `GET` | `/test-server` | Check if server is running | ❌ |
+
+```json
+{
+  "success": true,
+  "message": "Server is running correctly 🚀"
 }
 ```
 
@@ -635,7 +704,6 @@ Content-Type: application/json
 # frontend/.env.production
 VITE_API_URL=https://careerboost-ai-g7vs.onrender.com/api
 ```
-> Used Vite environment variables (`VITE_`) to dynamically set the API base URL. The development `.env` points to localhost; the production `.env` points to Render.
 
 ---
 
@@ -655,7 +723,7 @@ const protect = async (req, res, next) => {
 };
 ```
 ```jsx
-// Frontend: PrivateRoute.jsx
+// Frontend: routes/PrivateRoute.jsx
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("token");
   return token ? children : <Navigate to="/login" />;
@@ -666,11 +734,11 @@ const PrivateRoute = ({ children }) => {
 
 ### 3. 📄 PDF Parsing Issues
 
-**Problem:** `pdf-parse` was throwing errors when processing certain PDF formats, and the package had configuration issues in newer Node environments.
+**Problem:** `pdf-parse` was throwing errors when processing certain PDF formats in newer Node environments.
 
 **Solution:**
 ```javascript
-// utils/pdfParser.js
+// utils/extractResumeText.js
 const pdfParse = require("pdf-parse");
 const extractText = async (filePath) => {
   const dataBuffer = fs.readFileSync(filePath);
@@ -678,31 +746,29 @@ const extractText = async (filePath) => {
   return data.text;
 };
 ```
-> Switched to reading the file buffer directly with `fs.readFileSync` instead of relying on stream-based approaches, which resolved compatibility issues.
 
 ---
 
 ### 4. 💾 Render Ephemeral Storage
 
-**Problem:** Files uploaded to Render's server were being lost on every new deployment or server restart due to ephemeral storage.
+**Problem:** Files uploaded to Render were lost on every deployment due to ephemeral storage.
 
-**Solution (Implemented):** Files are processed immediately upon upload and text is extracted before the process ends.
+**Solution (Implemented):** Files are processed immediately upon upload — text extracted before the process ends.
 
-**Future Solution:** Migrate to cloud object storage:
+**Future Solution:**
 ```
 Multer (memory storage) → Cloudinary / AWS S3
 ```
-> Files will be streamed directly to the cloud, bypassing ephemeral disk entirely.
 
 ---
 
 ### 5. 🤖 Gemini Response Formatting
 
-**Problem:** Gemini's raw text responses were inconsistently formatted, making it difficult to parse and display structured data.
+**Problem:** Gemini's raw responses were inconsistently formatted, making structured parsing difficult.
 
 **Solution:**
 ```javascript
-// Structured JSON prompt sent to Gemini
+// utils/buildAnalysisPrompt.js
 const prompt = `
 Analyze the following resume against the job description.
 Return ONLY a valid JSON object in this exact format:
@@ -722,9 +788,9 @@ Job Description: ${jobDescription}
 
 ### 6. 🐛 Production Debugging
 
-**Problem:** Bugs that didn't appear in local development were surfacing only in production.
+**Problem:** Bugs surfaced only in production and were difficult to trace.
 
-**Solution:** Combined Render's live log streaming with browser DevTools Network tab analysis. Added structured console logging on the backend to trace each request lifecycle. Used `try/catch` blocks on all async operations with descriptive error messages.
+**Solution:** Combined Render's live log streaming with browser DevTools. Added structured `console.log` at every key step and wrapped all async operations in `try/catch` with descriptive error messages.
 
 ---
 
@@ -734,12 +800,12 @@ Job Description: ${jobDescription}
 |---|----------|
 | 1 | 🏗️ **MERN Stack Architecture** — Building a complete, scalable full-stack application end-to-end |
 | 2 | 🔐 **JWT Authentication** — Implementing stateless, secure authentication from scratch |
-| 3 | 🌐 **REST API Design** — Designing consistent, versioned APIs with proper HTTP methods and status codes |
+| 3 | 🌐 **REST API Design** — Designing consistent APIs with proper HTTP methods and status codes |
 | 4 | 🤖 **AI Integration** — Connecting and prompting Google Gemini API in a production workflow |
 | 5 | ☁️ **Cloud Deployment** — Deploying frontend and backend independently to Vercel and Render |
-| 6 | 🐛 **Production Debugging** — Diagnosing and fixing bugs that only appear in production environments |
-| 7 | 🌱 **Environment Management** — Managing secrets and environment-specific configs across dev and prod |
-| 8 | 🔄 **Full Stack Lifecycle** — Owning the complete development lifecycle: design → build → deploy → debug |
+| 6 | 🐛 **Production Debugging** — Diagnosing and fixing bugs that only appear in production |
+| 7 | 🌱 **Environment Management** — Managing secrets and configs across dev and prod |
+| 8 | 🔄 **Full Stack Lifecycle** — Owning design → build → deploy → debug end-to-end |
 
 ---
 
@@ -780,7 +846,7 @@ Job Description: ${jobDescription}
 ✔  Built a production-ready MERN Stack application deployed on Vercel and Render
 ✔  Integrated Google Gemini AI into a real-world resume analysis workflow
 ✔  Implemented end-to-end JWT Authentication with protected frontend and backend routes
-✔  Designed and documented 12+ RESTful API endpoints using Express.js
+✔  Designed and documented 10+ RESTful API endpoints across 5 route modules
 ✔  Engineered a PDF upload and text extraction pipeline using Multer and pdf-parse
 ✔  Solved production deployment challenges including ephemeral storage and CORS issues
 ✔  Applied structured JSON prompting techniques for reliable AI response formatting
