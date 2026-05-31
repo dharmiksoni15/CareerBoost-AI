@@ -6,6 +6,7 @@ function AIAnalysis() {
 
   // Handle AI Analysis
   const handleAnalysis = async () => {
+     console.log("ANALYZE CLICKED");
     try {
       const payload = {
         resumeId: "6a19ec38d822ba27b9daebac",
