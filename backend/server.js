@@ -39,6 +39,15 @@ app.use("/api/job-description", jobDescriptionRoutes);
 app.use("/api/analysis", analysisRoutes);
 app.use("/api/ai", aiRoutes);
 
+// Serve frontend in production and fallback to index.html for client-side routing
+if (process.env.NODE_ENV === 'production') {
+  const path = require('path')
+  app.use(express.static(path.join(__dirname, '..', 'frontend', 'dist')))
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'frontend', 'dist', 'index.html'))
+  })
+}
+
 // ================= DEBUG LOGS =================
 console.log("✅ Routes loaded:");
 console.log("- /api/auth");

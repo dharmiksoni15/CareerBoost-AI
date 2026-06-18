@@ -10,6 +10,7 @@ const JobDescription = require("../models/JobDescription");
 // Utilities
 const extractResumeText = require("../utils/extractResumeText");
 const buildAnalysisPrompt = require("../utils/buildAnalysisPrompt");
+const { generateWithFallback } = require("../services/aiService");
 
 console.log("Extract Function:", extractResumeText);
 
@@ -17,7 +18,7 @@ console.log("Extract Function:", extractResumeText);
 
 const testGemini = async (req, res) => {
   try {
-    console.log("TEST GEMINI ROUTE HIT"); 
+    console.log("TEST GEMINI ROUTE HIT");
 
     const response = await ai.models.generateContent({
       model: "gemini-3.5-flash",
@@ -94,7 +95,6 @@ const analyzeResume = async (req, res) => {
 
     console.log("Extracted Resume Text Success");
     console.log(resumeText);
-    
 
     // ==================== BUILD PROMPT ====================
     const prompt = buildAnalysisPrompt(resumeText, jobDescription.description);
@@ -129,10 +129,7 @@ const analyzeResume = async (req, res) => {
     let response;
 
     try {
-      response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
-        contents: prompt,
-      });
+      response = await generateWithFallback(prompt);
     } catch (geminiError) {
       console.log("Gemini API Error:", geminiError);
 
@@ -172,7 +169,12 @@ const analyzeResume = async (req, res) => {
 
     if (response && response.text) {
       try {
-        analysisData = JSON.parse(response.text);
+        const cleanText = response.text
+          .replace(/```json/g, "")
+          .replace(/```/g, "")
+          .trim();
+
+        analysisData = JSON.parse(cleanText);
       } catch (e) {
         analysisData.summary = response.text;
       }
