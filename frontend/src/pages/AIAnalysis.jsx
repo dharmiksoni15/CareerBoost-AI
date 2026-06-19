@@ -1,12 +1,27 @@
 import React, { useState } from "react";
 import api from "../services/api";
+import AnalysisScore from "../components/ai-dashboard/AnalysisScore";
+import SummaryCard from "../components/ai-dashboard/SummaryCard";
+import StrengthCard from "../components/ai-dashboard/StrengthCard";
+import WeaknessCard from "../components/ai-dashboard/WeaknessCard";
+import ATSChecklist from "../components/ai-dashboard/ATSChecklist";
+import InterviewAccordion from "../components/ai-dashboard/InterviewAccordion";
+import HiringVerdict from "../components/ai-dashboard/HiringVerdict";
+import { formatAnalysisResponse } from "../utils/formatAnalysisResponse";
 
 function AIAnalysis() {
-  const [analysis, setAnalysis] = useState(null);
+  const [analysis, setAnalysis] = useState(()=>{
+    try{
+      const raw = localStorage.getItem('analysis');
+      return raw? JSON.parse(raw): null;
+    }catch(e){return null}
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string|null>(null);
 
-  // Handle AI Analysis
   const handleAnalysis = async () => {
-     console.log("ANALYZE CLICKED");
+    setLoading(true);
+    setError(null);
     try {
       const payload = {
         resumeId: "6a19ec38d822ba27b9daebac",
@@ -14,78 +29,66 @@ function AIAnalysis() {
       };
 
       const response = await api.post("/ai/analyze", payload);
-
-      console.log("AI ANALYSIS SUCCESS:", response.data);
-
-      setAnalysis(response.data.analysis); // 👈 object store
-    } catch (error) {
-      console.log("AI ANALYSIS ERROR:", error.response?.data || error.message);
+  const formatted = formatAnalysisResponse(response.data.analysis);
+  setAnalysis(formatted);
+  try{ localStorage.setItem('analysis', JSON.stringify(formatted)) }catch(e){}
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Analysis failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-10">
-      
-      {/* Heading */}
-      <h1 className="text-4xl font-bold mb-8 text-center text-blue-600">
-        AI Resume Analysis
-      </h1>
+    <div className="min-h-screen bg-[#0b1220] p-8 text-white">
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold">AI Resume Insights</h1>
+          <button onClick={handleAnalysis} className="bg-blue-600 px-4 py-2 rounded-lg disabled:opacity-60" disabled={loading}>{loading?'Analyzing...':'Run Analysis'}</button>
+        </div>
 
-      {/* Button */}
-      <div className="flex justify-center mb-10">
-        <button
-          onClick={handleAnalysis}
-          className="bg-blue-600 text-white px-8 py-3 rounded-xl hover:bg-blue-700"
-        >
-          Generate AI Analysis
-        </button>
-      </div>
-
-      {/* Result */}
-      <div className="bg-white rounded-2xl shadow-lg p-8">
-
-        <h2 className="text-2xl font-bold mb-6">
-          AI Result
-        </h2>
+        {error && (
+          <div className="bg-red-900/30 p-4 rounded-lg">
+            <div className="font-semibold">Error</div>
+            <div className="text-sm">{error}</div>
+            <button className="mt-2 underline" onClick={handleAnalysis}>Retry</button>
+          </div>
+        )}
 
         {!analysis ? (
-          "No AI analysis generated yet."
+          <div className="bg-white/5 rounded-2xl p-8 text-center">{loading? 'Analyzing...': 'No AI analysis yet. Click "Run Analysis"'}</div>
         ) : (
-          <div className="space-y-4">
+          <div className="grid lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-4">
+              <AnalysisScore score={analysis.score} />
+              <SummaryCard summary={analysis.summary} />
 
-            {/* Score */}
-            <h3 className="text-xl font-bold">
-              Score: {analysis.score}/100
-            </h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <h4 className="font-semibold mb-3">Strengths</h4>
+                  <div className="grid gap-3">
+                    {(analysis.strengths||[]).map((s,i)=>(<StrengthCard key={i} title={s} />))}
+                  </div>
+                </div>
 
-            {/* Summary */}
-            <p>{analysis.summary}</p>
+                <div>
+                  <h4 className="font-semibold mb-3">Improvement Areas</h4>
+                  <div className="grid gap-3">
+                    {(analysis.weaknesses||[]).map((w,i)=>(<WeaknessCard key={i} title={w} priority={i===0?'High':'Medium'} />))}
+                  </div>
+                </div>
+              </div>
 
-            {/* Strengths */}
-            <div>
-              <h4 className="font-bold">Strengths</h4>
-              <ul className="list-disc ml-5">
-                {analysis.strengths?.map((item, i) => (
-                  <li key={i}>✔ {item}</li>
-                ))}
-              </ul>
+              <div className="mt-4">
+                <h4 className="font-semibold mb-3">Interview Questions</h4>
+                <InterviewAccordion questions={analysis.interviewQuestions||[]} />
+              </div>
             </div>
 
-            {/* Weaknesses */}
-            <div>
-              <h4 className="font-bold">Weaknesses</h4>
-              <ul className="list-disc ml-5">
-                {analysis.weaknesses?.map((item, i) => (
-                  <li key={i}>⚠ {item}</li>
-                ))}
-              </ul>
+            <div className="space-y-4">
+              <ATSChecklist items={analysis.atsSuggestions} />
+              <HiringVerdict verdict={analysis.recommendation} />
             </div>
-
-            {/* Suggestion */}
-            <p className="mt-3">
-              💡 {analysis.suggestion}
-            </p>
-
           </div>
         )}
       </div>

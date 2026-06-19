@@ -1,15 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../services/api";
+import { AuthContext } from "../context/AuthContext";
 
 function Register() {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({
@@ -20,16 +23,17 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    if (loading) return;
+    setLoading(true);
     try {
       const res = await api.post("/auth/register", form);
-
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-
-      navigate("/dashboard");
+      // use context login to persist and update
+      await login({ token: res.data.token, user: res.data.user });
+      navigate('/dashboard');
     } catch (error) {
-      console.log("REGISTER ERROR:", error.response?.data || error.message);
+      console.error("REGISTER ERROR:", error.response?.data || error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -70,8 +74,8 @@ function Register() {
           className="w-full p-3 mb-6 rounded-xl bg-white/10 border border-white/20 text-white"
         />
 
-        <button className="w-full bg-blue-600 text-white py-3 rounded-xl">
-          Register
+        <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white py-3 rounded-xl disabled:opacity-60">
+          {loading ? 'Creating account...' : 'Register'}
         </button>
 
         <p className="text-center text-gray-300 mt-4">
