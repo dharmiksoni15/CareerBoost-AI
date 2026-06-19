@@ -12,13 +12,21 @@ import HiringVerdict from "../components/ai-dashboard/HiringVerdict";
 import { formatAnalysisResponse } from "../utils/formatAnalysisResponse";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
+import { useContext, useEffect } from 'react'
+import { AuthContext } from '../context/AuthContext'
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [resumeId, setResumeId] = useState(null);
   const [jobDescriptionId, setJobDescriptionId] = useState(null);
+  const { user } = useContext(AuthContext)
   const [analysis, setAnalysis] = useState(()=>{
-    try{ const raw = localStorage.getItem('analysis'); return raw? JSON.parse(raw): null }catch(e){ return null }
+    try{
+      if(!user) return null
+      const key = `analysis_${user._id || user.id || user.userId}`
+      const raw = localStorage.getItem(key)
+      return raw? JSON.parse(raw): null
+    }catch(e){ return null }
   });
   const [ready, setReady] = useState(false);
 
@@ -41,7 +49,12 @@ const Dashboard = () => {
   console.log("AI RESPONSE:", res.data);
   const formatted = formatAnalysisResponse(res.data.analysis);
   setAnalysis(formatted);
-  try{ localStorage.setItem('analysis', JSON.stringify(formatted)) }catch(e){}
+    try{
+      if(user){
+        const key = `analysis_${user._id || user.id || user.userId}`
+        localStorage.setItem(key, JSON.stringify(formatted))
+      }
+    }catch(e){}
     } catch (err) {
       alert("Analysis failed");
     } finally {
@@ -49,10 +62,21 @@ const Dashboard = () => {
     }
   };
 
+  const { logoutAndClear } = useContext(AuthContext)
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    try{ if(logoutAndClear) logoutAndClear() }catch(e){}
     navigate("/login");
   };
+
+  // if user changes (login/logout), reload analysis for the new user or clear it
+  useEffect(()=>{
+    try{
+      if(!user){ setAnalysis(null); return }
+      const key = `analysis_${user._id || user.id || user.userId}`
+      const raw = localStorage.getItem(key)
+      setAnalysis(raw? JSON.parse(raw): null)
+    }catch(e){ setAnalysis(null) }
+  }, [user])
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#0f172a] px-4 py-8">

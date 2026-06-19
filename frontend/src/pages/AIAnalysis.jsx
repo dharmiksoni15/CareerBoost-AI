@@ -8,11 +8,16 @@ import ATSChecklist from "../components/ai-dashboard/ATSChecklist";
 import InterviewAccordion from "../components/ai-dashboard/InterviewAccordion";
 import HiringVerdict from "../components/ai-dashboard/HiringVerdict";
 import { formatAnalysisResponse } from "../utils/formatAnalysisResponse";
+import { useContext, useEffect } from 'react'
+import { AuthContext } from '../context/AuthContext'
 
 function AIAnalysis() {
+  const { user } = useContext(AuthContext)
   const [analysis, setAnalysis] = useState(()=>{
     try{
-      const raw = localStorage.getItem('analysis');
+      if(!user) return null
+      const key = `analysis_${user._id || user.id || user.userId}`
+      const raw = localStorage.getItem(key);
       return raw? JSON.parse(raw): null;
     }catch(e){return null}
   });
@@ -31,7 +36,12 @@ function AIAnalysis() {
       const response = await api.post("/ai/analyze", payload);
   const formatted = formatAnalysisResponse(response.data.analysis);
   setAnalysis(formatted);
-  try{ localStorage.setItem('analysis', JSON.stringify(formatted)) }catch(e){}
+  try{
+    if(user){
+      const key = `analysis_${user._id || user.id || user.userId}`
+      localStorage.setItem(key, JSON.stringify(formatted))
+    }
+  }catch(e){}
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Analysis failed');
     } finally {

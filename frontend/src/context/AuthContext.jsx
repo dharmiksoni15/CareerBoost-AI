@@ -25,6 +25,15 @@ export const AuthProvider = ({ children }) => {
     else localStorage.removeItem('user')
   }, [user])
 
+  // migrate/cleanup legacy global analysis key on mount so it doesn't leak between users
+  useEffect(()=>{
+    try{
+      if(localStorage.getItem('analysis')){
+        localStorage.removeItem('analysis')
+      }
+    }catch(e){}
+  }, [])
+
   // login returns a promise so callers can await navigation after calling login
   const login = async ({ token: t, user: u }) => {
     // persist immediately to localStorage to avoid race with navigation
@@ -44,6 +53,17 @@ export const AuthProvider = ({ children }) => {
     setUser(null)
     localStorage.removeItem('token')
     localStorage.removeItem('user')
+  }
+
+  // extend logout to also clear any user-scoped analysis key
+  const logoutAndClear = () => {
+    try{
+      if(user){
+        const key = `analysis_${user._id || user.id || user.userId}`
+        localStorage.removeItem(key)
+      }
+    }catch(e){}
+    logout()
   }
 
   return (
