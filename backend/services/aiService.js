@@ -1,8 +1,8 @@
 const ai = require("../config/gemini");
 
 const MODELS = [
-  "gemini-3.5-flash",
-  "gemini-3.5-flash-lite",
+  "gemini-2.5-flash",
+  "gemini-2.5-pro",
 ];
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -23,16 +23,14 @@ const generateWithFallback = async (prompt) => {
 
       return response;
     } catch (error) {
-      console.log(`${model} failed`, error.status);
+      console.error(`${model} failed`, error);
 
       lastError = error;
 
-      if (error.status === 503) {
-        await sleep(1500);
+      if ([429, 500, 503].includes(error.status)) {
+        await sleep(2000);
         continue;
       }
-
-      throw error;
     }
   }
 
